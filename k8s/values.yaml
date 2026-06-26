@@ -1,0 +1,36 @@
+# Global values
+global:
+  environment: production
+  domain: vave-hrm.com
+
+# Backend configuration
+backend:
+  replicaCount: 2
+  image:
+    repository: gcr.io/vave-hrm/backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 4000
+  env:
+    PORT: 4000
+    NODE_ENV: production
+    DB_HOST: postgres-service
+    DB_PORT: 5432
+    DB_NAME: vave_hrm
+    REDIS_HOST: redis-service
+    REDIS_PORT: 6379
+
+# Frontend configuration
+frontend:
+  replicaCount: 2
+  image:
+    repository: gcr.io/vave-hrm/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    NEXT_PUBLIC_API_URL: https://api.vave-hrm.com/api/v1
