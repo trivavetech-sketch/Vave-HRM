@@ -24,29 +24,49 @@ import { AuditModule } from './modules/audit/audit.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (cfg: ConfigService) => ({
-        type: 'postgres',
-        host: cfg.get('DB_HOST', 'localhost'),
-        port: cfg.get<number>('DB_PORT', 5432),
-        username: cfg.get('DB_USER', 'postgres'),
-        password: cfg.get('DB_PASS', 'postgres'),
-        database: cfg.get('DB_NAME', 'vave_hrm'),
-        autoLoadEntities: true,
-        synchronize: cfg.get('NODE_ENV') !== 'production',
-        logging: cfg.get('NODE_ENV') !== 'production',
-      }),
+      useFactory: (cfg: ConfigService) => {
+        const dbUrl = cfg.get('DATABASE_URL');
+        const useSsl = cfg.get('DB_SSL') === 'true' || !!dbUrl;
+        
+        if (dbUrl) {
+          return {
+            type: 'postgres',
+            url: dbUrl,
+            ssl: useSsl ? { rejectUnauthorized: false } : false,
+            autoLoadEntities: true,
+            synchronize: cfg.get('NODE_ENV') !== 'production',
+            logging: cfg.get('NODE_ENV') !== 'production',
+          };
+        }
+
+        return {
+          type: 'postgres',
+          host: cfg.get('DB_HOST'),
+          port: cfg.get<number>('DB_PORT'),
+          username: cfg.get('DB_USER'),
+          password: cfg.get('DB_PASS'),
+          database: cfg.get('DB_NAME'),
+          ssl: useSsl ? { rejectUnauthorized: false } : false,
+          autoLoadEntities: true,
+          synchronize: cfg.get('NODE_ENV') !== 'production',
+          logging: cfg.get('NODE_ENV') !== 'production',
+        };
+      },
     }),
 
     // ── Bull (Redis queues) ─────────────────────────────
     BullModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (cfg: ConfigService) => ({
-        redis: {
-          host: cfg.get('REDIS_HOST', 'localhost'),
-          port: cfg.get<number>('REDIS_PORT', 6379),
-        },
-      }),
+      useFactory: (cfg: ConfigService) => {
+        const redisUrl = cfg.get('REDIS_URL');
+        return {
+          redis: redisUrl || {
+            host: cfg.get('REDIS_HOST', 'localhost'),
+            port: cfg.get<number>('REDIS_PORT', 6379),
+          },
+        };
+      },
     }),
 
     // ── Feature modules ─────────────────────────────────

@@ -4,7 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Employee } from '../../employee/entities/employee.entity';
 
 @Entity('attendance')
 export class Attendance {
@@ -13,6 +16,10 @@ export class Attendance {
 
   @Column({ type: 'uuid' })
   employeeId!: string;
+
+  @ManyToOne(() => Employee)
+  @JoinColumn({ name: 'employeeId', referencedColumnName: 'employeeId' })
+  employee!: Employee;
 
   @Column({ type: 'timestamptz', nullable: true })
   checkIn?: Date;
@@ -25,6 +32,9 @@ export class Attendance {
 
   @Column({ type: 'text', nullable: true })
   location?: string;
+
+  @Column({ type: 'text', default: 'On Time' })
+  status!: string; // On Time | Late
 
   @CreateDateColumn()
   createdAt!: Date;

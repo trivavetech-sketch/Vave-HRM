@@ -20,11 +20,11 @@ export class Employee {
   @Column({ type: 'uuid', nullable: true })
   branchId?: string;
 
-  @Column({ type: 'uuid', nullable: true })
-  deptId?: string;
+  @Column({ type: 'text', nullable: true })
+  dept?: string;
 
-  @Column({ type: 'uuid', nullable: true })
-  desigId?: string;
+  @Column({ type: 'text', nullable: true })
+  role?: string;
 
   @Column({ type: 'text' })
   firstName!: string;

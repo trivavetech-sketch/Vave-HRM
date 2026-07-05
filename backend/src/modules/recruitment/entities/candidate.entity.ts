@@ -18,6 +18,9 @@ export class Candidate {
   email?: string;
 
   @Column({ type: 'text', nullable: true })
+  role?: string;
+
+  @Column({ type: 'text', nullable: true })
   resumeUrl?: string;
 
   @Column({ type: 'text', default: 'applied' })

@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Attendance } from './entities/attendance.entity';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
 
 @Injectable()
 export class AttendanceService {
@@ -21,6 +22,7 @@ export class AttendanceService {
     return this.repo.find({
       where: whereClause,
       order: { checkIn: 'DESC' },
+      relations: ['employee'],
     });
   }
 
@@ -30,8 +32,12 @@ export class AttendanceService {
     return record;
   }
 
-  async create(data: Partial<Attendance>): Promise<Attendance> {
-    const record = this.repo.create(data);
+  async checkIn(data: CreateAttendanceDto): Promise<Attendance> {
+    const record = this.repo.create({
+      ...data,
+      checkIn: new Date(),
+      status: 'On Time', // Can be calculated based on shift
+    });
     return this.repo.save(record);
   }
 

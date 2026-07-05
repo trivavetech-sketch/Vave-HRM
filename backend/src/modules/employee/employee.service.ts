@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Employee } from './entities/employee.entity';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Injectable()
 export class EmployeeService {
@@ -25,12 +27,12 @@ export class EmployeeService {
     return emp;
   }
 
-  async create(data: Partial<Employee>): Promise<Employee> {
+  async create(data: CreateEmployeeDto): Promise<Employee> {
     const emp = this.repo.create(data);
     return this.repo.save(emp);
   }
 
-  async update(id: string, data: Partial<Employee>): Promise<Employee> {
+  async update(id: string, data: UpdateEmployeeDto): Promise<Employee> {
     await this.findById(id);
     await this.repo.update(id, data);
     return this.findById(id);
